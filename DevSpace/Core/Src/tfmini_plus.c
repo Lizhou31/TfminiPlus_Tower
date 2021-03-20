@@ -65,6 +65,5 @@ int8_t fetchDistance(tfmini_handler *tfmini)
         return -1;
     }
     tfmini->Distance = ((uint16_t)tfmini->data[3] << 8 | (uint16_t)tfmini->data[2]);
-    tfmini->Strenth = ((uint16_t)tfmini->data[5] << 8 | (uint16_t)tfmini->data[4]);
     return 0;
 }

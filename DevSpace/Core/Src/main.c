@@ -86,6 +86,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   I2CHANDLER i2c1handler;
+  UARTHANDLER uart1handler;
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -103,6 +104,8 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   i2c_handler_Init(i2c1handler, I2C1);
+  uart1handler->Instance = USART1;
+  uart1handler->ErrorCode = HAL_UART_ERROR_NONE;
   __IO uint32_t tmp_uTick;
   tmp_uTick = GetTick();
   tfmini_handler tfmini[4] =
@@ -118,6 +121,7 @@ int main(void)
        {.DevAddress = 0x13,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler}};
+  uint8_t s[6] = {'t','e','s','t','\r','\n'};
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -134,6 +138,7 @@ int main(void)
       //        tfmini->data[0], tfmini->data[1], tfmini->data[2], tfmini->data[3], tfmini->data[4],
       //        tfmini->data[5], tfmini->data[6], tfmini->data[7], tfmini->data[8]);
       printf("%d\r\n", tfmini->Distance);
+      UART_Transmit(uart1handler, s, sizeof(s), 0x10);
       tmp_uTick = GetTick();
     }
   }

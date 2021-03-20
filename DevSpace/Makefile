@@ -50,6 +50,7 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_pwr.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_usart.c \
 Core/Src/system_stm32f1xx.c \
 Core/Src/i2c.c \
+Core/Src/uart.c \
 Core/Src/tfmini_plus.c
 
 # ASM sources
