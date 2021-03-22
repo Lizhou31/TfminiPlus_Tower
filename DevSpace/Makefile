@@ -119,7 +119,9 @@ C_INCLUDES =  \
 -ICore/Inc \
 -IDrivers/STM32F1xx_HAL_Driver/Inc \
 -IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
--IDrivers/CMSIS/Include
+-IDrivers/CMSIS/Include \
+-I../c_library_v2/common/ \
+-I../c_library_v2
 
 
 # compile gcc flags

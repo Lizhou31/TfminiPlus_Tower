@@ -107,6 +107,7 @@ int main(void)
   uart1handler->Instance = USART1;
   uart1handler->ErrorCode = HAL_UART_ERROR_NONE;
   __IO uint32_t tmp_uTick;
+  __IO uint16_t mavlinklength = 0;
   tmp_uTick = GetTick();
   tfmini_handler tfmini[4] =
       {{.DevAddress = 0x15,
@@ -121,7 +122,7 @@ int main(void)
        {.DevAddress = 0x13,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler}};
-  uint8_t s[6] = {'t','e','s','t','\r','\n'};
+  mavlink_message_t msg;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -131,14 +132,18 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (GetTick() - tmp_uTick > 20)
+    if (GetTick() - tmp_uTick > 30)
     {
       fetchDistance(tfmini);
       // printf("0x%x0x%x0x%x0x%x0x%x0x%x0x%x0x%x0x%x\r\n",
       //        tfmini->data[0], tfmini->data[1], tfmini->data[2], tfmini->data[3], tfmini->data[4],
       //        tfmini->data[5], tfmini->data[6], tfmini->data[7], tfmini->data[8]);
       printf("%d\r\n", tfmini->Distance);
-      UART_Transmit(uart1handler, s, sizeof(s), 0x10);
+      // UART_Transmit(uart1handler, s, sizeof(s), 0x10);
+      mavlinklength = mavlink_msg_obstacle_distance_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 2, &(tfmini->Distance), 0, 6, 120, 360.f, 0.f, 0);
+      uint8_t *Txmsg = (uint8_t *)malloc(mavlinklength * sizeof(uint8_t));
+      mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
+      UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
       tmp_uTick = GetTick();
     }
   }

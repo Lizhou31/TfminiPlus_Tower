@@ -80,13 +80,16 @@ int8_t UART_Transmit(uartHandler *huart, uint8_t *pData, uint16_t Size, uint32_t
     huart->TxXferSize = Size;
     huart->TxXferCount = Size;
 
-    while (huart->TxXferCount > 0)
+    while (huart->TxXferCount > 0U)
     {
         if (UART_WaitOnTXEFlagUntilTimeout(huart, tickstart, Timeout))
             return -1;
-        LL_USART_TransmitData8(huart->Instance, *(huart->pTxBuffptr++));
+        LL_USART_TransmitData8(huart->Instance, (uint8_t)(*(huart->pTxBuffptr) & 0xFFU));
+        huart->pTxBuffptr++;
         huart->TxXferCount--;
     }
+    if (UART_WaitOnTXEFlagUntilTimeout(huart, tickstart, Timeout))
+        return -1;
     if (UART_WaitOnTCFlagUntilTimeout(huart, tickstart, Timeout))
         return -1;
 
