@@ -123,6 +123,7 @@ int main(void)
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler}};
   mavlink_message_t msg;
+  uint8_t *Txmsg = (uint8_t *)malloc(174 * sizeof(uint8_t));
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -140,8 +141,12 @@ int main(void)
       //        tfmini->data[5], tfmini->data[6], tfmini->data[7], tfmini->data[8]);
       printf("%d\r\n", tfmini->Distance);
       // UART_Transmit(uart1handler, s, sizeof(s), 0x10);
-      mavlinklength = mavlink_msg_obstacle_distance_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 2, &(tfmini->Distance), 0, 6, 120, 360.f, 0.f, 0);
-      uint8_t *Txmsg = (uint8_t *)malloc(mavlinklength * sizeof(uint8_t));
+      uint16_t distance[72] = {0};
+      distance[0] = tfmini->Distance;
+      distance[1] = tfmini->Distance;
+      distance[2] = tfmini->Distance;
+      distance[3] = tfmini->Distance;
+      mavlink_msg_obstacle_distance_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 2, distance, 0, 20, 1200, 90.f, 0.f, 0);
       mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
       UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
       tmp_uTick = GetTick();
