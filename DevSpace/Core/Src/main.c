@@ -123,7 +123,7 @@ int main(void)
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler}};
   mavlink_message_t msg;
-  uint8_t *Txmsg = (uint8_t *)malloc(174 * sizeof(uint8_t));
+  uint8_t *Txmsg[174] = {0};
   /* USER CODE END 2 */
 
   /* Infinite loop */
