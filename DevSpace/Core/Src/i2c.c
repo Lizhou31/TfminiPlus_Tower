@@ -244,13 +244,11 @@ int8_t I2C_Master_Transmit(i2cHandler *hi2c, uint8_t DevAddress, uint8_t *pData,
         /* Wait until BUSY flag is reset */
         if (I2C_WaitOnBUSYFlagUntilTimeout(hi2c, tickstart, Timeout))
             return -1;
-        
+
         /* Check if the I2C is already enabled */
         if ((hi2c->Instance->CR1 & I2C_CR1_PE) != I2C_CR1_PE)
         {
-            hi2c->State = HAL_I2C_STATE_READY;
-            hi2c->ErrorCode |= HAL_I2C_ERROR_DISABLE;
-            return -1;
+            SET_BIT(hi2c->Instance->CR1, I2C_CR1_PE);
         }
 
         /* Disable Pos */
@@ -324,9 +322,7 @@ int8_t I2C_Master_Receive(i2cHandler *hi2c, uint8_t DevAddress, uint8_t *pData, 
         /* Check if the I2C is already enabled */
         if ((hi2c->Instance->CR1 & I2C_CR1_PE) != I2C_CR1_PE)
         {
-            hi2c->State = HAL_I2C_STATE_READY;
-            hi2c->ErrorCode |= HAL_I2C_ERROR_DISABLE;
-            return -1;
+            SET_BIT(hi2c->Instance->CR1, I2C_CR1_PE);
         }
 
         /* Disable Pos */

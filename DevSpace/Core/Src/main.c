@@ -109,17 +109,17 @@ int main(void)
   __IO uint32_t tmp_uTick;
   __IO uint16_t mavlinklength = 0;
   tmp_uTick = GetTick();
-  tfmini_handler tfmini[4] =
-      {{.DevAddress = 0x15,
+  tfmini_handler tfmini[] =
+      {{.DevAddress = 0x10,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler},
        {.DevAddress = 0x11,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler},
-       {.DevAddress = 0x12,
+       {.DevAddress = 0x13,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler},
-       {.DevAddress = 0x13,
+       {.DevAddress = 0x15,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler}};
   mavlink_message_t msg;
@@ -136,17 +136,37 @@ int main(void)
     if (GetTick() - tmp_uTick > 30)
     {
       fetchDistance(tfmini);
-      // printf("0x%x0x%x0x%x0x%x0x%x0x%x0x%x0x%x0x%x\r\n",
-      //        tfmini->data[0], tfmini->data[1], tfmini->data[2], tfmini->data[3], tfmini->data[4],
-      //        tfmini->data[5], tfmini->data[6], tfmini->data[7], tfmini->data[8]);
-      printf("%d\r\n", tfmini->Distance);
-      // UART_Transmit(uart1handler, s, sizeof(s), 0x10);
+      if (tfmini->hi2c->ErrorCode > 0U)
+      {
+        SET_BIT(tfmini->hi2c->Instance->CR1, I2C_CR1_SWRST);
+      }
+      fetchDistance(tfmini + 1);
+      if ((tfmini + 1)->hi2c->ErrorCode > 0U)
+      {
+        SET_BIT((tfmini + 1)->hi2c->Instance->CR1, I2C_CR1_SWRST);
+      }
+      fetchDistance(tfmini + 2);
+      if ((tfmini + 2)->hi2c->ErrorCode > 0U)
+      {
+        SET_BIT((tfmini + 2)->hi2c->Instance->CR1, I2C_CR1_SWRST);
+      }
+      fetchDistance(tfmini + 3);
+      if ((tfmini + 3)->hi2c->ErrorCode > 0U)
+      {
+        SET_BIT((tfmini + 2)->hi2c->Instance->CR1, I2C_CR1_SWRST);
+      }
+      printf("%d %d %d %d\r\n", tfmini->hi2c->ErrorCode, (tfmini + 1)->hi2c->ErrorCode, (tfmini + 2)->hi2c->ErrorCode, (tfmini + 3)->hi2c->ErrorCode);
+
+      printf("%d %d %d %d\r\n", tfmini->Distance, (tfmini + 1)->Distance, (tfmini + 2)->Distance, (tfmini + 3)->Distance);
       uint16_t distance[72] = {0};
       distance[0] = tfmini->Distance;
       distance[1] = tfmini->Distance;
       distance[2] = tfmini->Distance;
       distance[3] = tfmini->Distance;
       mavlink_msg_obstacle_distance_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 2, distance, 0, 20, 1200, 90.f, 0.f, 0);
+      mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
+      UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
+      mavlink_msg_distance_sensor_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 20, 1200, distance[0], 2, 5, 24, 255, 0, 0, 0, 100);
       mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
       UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
       tmp_uTick = GetTick();
