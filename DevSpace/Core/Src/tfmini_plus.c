@@ -31,6 +31,12 @@ static uint8_t checkSum(uint8_t *data, uint16_t Size)
 
 static int8_t getData_cmd(tfmini_handler *tfmini, uint16_t transSize, uint16_t receiSize)
 {
+    uint8_t channel[1] = {1};
+    if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, (channel), 1U, 0xf))
+    {
+        return -1;
+    }
+
     if (I2C_Master_Transmit(tfmini->hi2c, (tfmini->DevAddress) << 1, tfmini->cmd, transSize, 0xf))
     {
         tfmini->ErrorCode = GETDATA_ERROR_WRITE;
