@@ -132,6 +132,7 @@ int main(void)
         .channel = 0b00010000}};
   mavlink_message_t msg;
   uint8_t *Txmsg[174] = {0};
+  ScanDistanceSensor(tfmini);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -143,11 +144,11 @@ int main(void)
     /* USER CODE BEGIN 3 */
     if (GetTick() - tmp_uTick > 30)
     {
-      fetchDistance(tfmini);
-      fetchDistance(tfmini+1);
-      fetchDistance(tfmini+2);
-      fetchDistance(tfmini+3);
-      fetchDistance(tfmini+4);
+      for (uint8_t i = 0; i < 5; i++)
+      {
+        if (tfmini_channel_count & (0b00000001 << i))
+          fetchDistance(tfmini + i);
+      }
       uint16_t distance[72] = {0};
       distance[0] = (tfmini)->Distance;
       distance[1] = (tfmini + 1)->Distance;

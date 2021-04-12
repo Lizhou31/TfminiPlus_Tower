@@ -2,12 +2,12 @@
 * FILENAME :        tfmini_plus.c
 *
 * DESCRIPTION :
-*       tfmini-plus lib for stm32 
+*       tfmini-plus lib for stm32
 *
 * COPYRIGHT :
 *       Copyright Lizhou 2021 All rights reserved.
 *
-* ORIGINAL AUTHOR(s) :    lisie31s@gmail.com        
+* ORIGINAL AUTHOR(s) :    lisie31s@gmail.com
 *
 * CREATE DATE :    17 March 2021
 *
@@ -19,6 +19,8 @@
 
 #include "tfmini_plus.h"
 
+uint8_t tfmini_channel_count;
+
 static uint8_t checkSum(uint8_t *data, uint16_t Size)
 {
     uint16_t temp = 0;
@@ -29,11 +31,11 @@ static uint8_t checkSum(uint8_t *data, uint16_t Size)
     return (uint8_t)temp;
 }
 
-static int8_t getData_cmd(tfmini_handler *tfmini, uint16_t transSize, uint16_t receiSize, uint8_t channel)
+static int8_t getData_cmd(tfmini_handler *tfmini, uint16_t transSize, uint16_t receiSize, uint8_t channel_mask)
 {
-    uint8_t channelmask[1] = {0b00000000};
-    channelmask[0] |= channel;
-    if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, channelmask, 1U, 0xf))
+    uint8_t channel[1] = {0b00000000};
+    channel[0] |= channel_mask;
+    if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, channel, 1U, 0xf))
     {
         return -1;
     }
@@ -49,10 +51,37 @@ static int8_t getData_cmd(tfmini_handler *tfmini, uint16_t transSize, uint16_t r
         return -1;
     }
 
-    channelmask[0] &= 0b00000000;
-    if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, channelmask, 1U, 0xf))
+    channel[0] &= 0b00000000;
+    if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, channel, 1U, 0xf))
     {
         return -1;
+    }
+    return 0;
+}
+
+int8_t ScanDistanceSensor(tfmini_handler *tfmini)
+{
+    for (uint8_t channel_mask = 0; channel_mask < 5; channel_mask++)
+    {
+        uint8_t channel[1] = {0b00000001 << channel_mask};
+        if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, (channel), 1U, 0xf))
+        {
+            return -1;
+        }
+        printf("t\n");
+        if (I2C_Master_Transmit(tfmini->hi2c, (tfmini->DevAddress) << 1, tfmini->cmd, 0U, 0xf))
+        {
+            tfmini = tfmini + 1;
+            continue;
+        }
+        tfmini_channel_count |= channel[0];
+        printf("%d\n", channel[0]);
+        channel[0] &= 0b00000000;
+        if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, channel, 1U, 0xf))
+        {
+            return -1;
+        }
+        tfmini = tfmini + 1;
     }
     return 0;
 }

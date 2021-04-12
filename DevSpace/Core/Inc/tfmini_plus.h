@@ -20,7 +20,6 @@
 #define __TFMINI_PLUS_H
 
 #include "i2c.h"
-
 #define GETDATA_ERROR_WRITE 0x01
 #define GETDATA_ERROR_READ 0x02
 #define DATAHEADER_FAILED 0x04
@@ -38,5 +37,6 @@ typedef struct
 } tfmini_handler, TFMINI_HANDLER[0];
 
 int8_t fetchDistance(tfmini_handler *tfmini);
-
+int8_t ScanDistanceSensor(tfmini_handler *tfmini);
+extern uint8_t tfmini_channel_count;
 #endif /* __TFMINI_PLUS_H */
