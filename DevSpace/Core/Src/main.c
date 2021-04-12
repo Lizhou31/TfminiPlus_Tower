@@ -116,13 +116,6 @@ int main(void)
         .channel = 0b00000001},
        {.DevAddress = 0x11,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
-<<<<<<< HEAD
-        .hi2c = i2c1handler},
-       {.DevAddress = 0x13,
-        .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
-        .hi2c = i2c1handler},
-       {.DevAddress = 0x15,
-=======
         .hi2c = i2c1handler,
         .channel = 0b00000010},
        {.DevAddress = 0x12,
@@ -130,7 +123,6 @@ int main(void)
         .hi2c = i2c1handler,
         .channel = 0b00000100},
        {.DevAddress = 0x13,
->>>>>>> i2c_multiplexer_test
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler,
         .channel = 0b00001000},
@@ -152,35 +144,10 @@ int main(void)
     if (GetTick() - tmp_uTick > 30)
     {
       fetchDistance(tfmini);
-<<<<<<< HEAD
-      if (tfmini->hi2c->ErrorCode > 0U)
-      {
-        SET_BIT(tfmini->hi2c->Instance->CR1, I2C_CR1_SWRST);
-      }
-      fetchDistance(tfmini + 1);
-      if ((tfmini + 1)->hi2c->ErrorCode > 0U)
-      {
-        SET_BIT((tfmini + 1)->hi2c->Instance->CR1, I2C_CR1_SWRST);
-      }
-      fetchDistance(tfmini + 2);
-      if ((tfmini + 2)->hi2c->ErrorCode > 0U)
-      {
-        SET_BIT((tfmini + 2)->hi2c->Instance->CR1, I2C_CR1_SWRST);
-      }
-      fetchDistance(tfmini + 3);
-      if ((tfmini + 3)->hi2c->ErrorCode > 0U)
-      {
-        SET_BIT((tfmini + 2)->hi2c->Instance->CR1, I2C_CR1_SWRST);
-      }
-      printf("%d %d %d %d\r\n", tfmini->hi2c->ErrorCode, (tfmini + 1)->hi2c->ErrorCode, (tfmini + 2)->hi2c->ErrorCode, (tfmini + 3)->hi2c->ErrorCode);
-
-      printf("%d %d %d %d\r\n", tfmini->Distance, (tfmini + 1)->Distance, (tfmini + 2)->Distance, (tfmini + 3)->Distance);
-=======
       fetchDistance(tfmini+1);
       fetchDistance(tfmini+2);
       fetchDistance(tfmini+3);
       fetchDistance(tfmini+4);
->>>>>>> i2c_multiplexer_test
       uint16_t distance[72] = {0};
       distance[0] = (tfmini)->Distance;
       distance[1] = (tfmini + 1)->Distance;
