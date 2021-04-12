@@ -29,10 +29,11 @@ static uint8_t checkSum(uint8_t *data, uint16_t Size)
     return (uint8_t)temp;
 }
 
-static int8_t getData_cmd(tfmini_handler *tfmini, uint16_t transSize, uint16_t receiSize)
+static int8_t getData_cmd(tfmini_handler *tfmini, uint16_t transSize, uint16_t receiSize, uint8_t channel)
 {
-    uint8_t channel[1] = {1};
-    if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, (channel), 1U, 0xf))
+    uint8_t channelmask[1] = {0b00000000};
+    channelmask[0] |= channel;
+    if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, channelmask, 1U, 0xf))
     {
         return -1;
     }
@@ -47,6 +48,12 @@ static int8_t getData_cmd(tfmini_handler *tfmini, uint16_t transSize, uint16_t r
         tfmini->ErrorCode = GETDATA_ERROR_READ;
         return -1;
     }
+
+    channelmask[0] &= 0b00000000;
+    if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, channelmask, 1U, 0xf))
+    {
+        return -1;
+    }
     return 0;
 }
 
@@ -58,7 +65,7 @@ int8_t fetchDistance(tfmini_handler *tfmini)
     tfmini->cmd[2] = 0x00;
     tfmini->cmd[3] = 0x01;
     tfmini->cmd[4] = checkSum(tfmini->cmd, 5);
-    if (getData_cmd(tfmini, 0x05, 0x09))
+    if (getData_cmd(tfmini, 0x05, 0x09, tfmini->channel))
         return -1;
     if (tfmini->data[0] != 0x59 || tfmini->data[1] != 0x59)
     {
