@@ -32,6 +32,7 @@ typedef struct
     uint8_t DevAddress;
     uint8_t cmd[5];
     uint8_t data[10];
+    uint8_t channel;
     uint16_t Distance;
     uint8_t ErrorCode;
 } tfmini_handler, TFMINI_HANDLER[0];
