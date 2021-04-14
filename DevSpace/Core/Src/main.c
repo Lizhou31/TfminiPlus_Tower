@@ -51,7 +51,7 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-extern void initialise_monitor_handles(void);
+// extern void initialise_monitor_handles(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -66,7 +66,7 @@ extern void initialise_monitor_handles(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  initialise_monitor_handles();
+  // initialise_monitor_handles();
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -114,7 +114,7 @@ int main(void)
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler,
         .channel = 0b00000001},
-       {.DevAddress = 0x11,
+       {.DevAddress = 0x13,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler,
         .channel = 0b00000010},
@@ -122,7 +122,7 @@ int main(void)
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler,
         .channel = 0b00000100},
-       {.DevAddress = 0x13,
+       {.DevAddress = 0x11,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler,
         .channel = 0b00001000},
@@ -132,7 +132,23 @@ int main(void)
         .channel = 0b00010000}};
   mavlink_message_t msg;
   uint8_t *Txmsg[174] = {0};
+  __IO uint32_t current;
+
+  LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_6);
+  current = GetTick();
+  while(GetTick() - current < 1000U);
   ScanDistanceSensor(tfmini);
+  if (tfmini_channel_count & (0b00000001 << 0))
+    LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_1);
+  if (tfmini_channel_count & (0b00000001 << 1))
+    LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_2);
+  if (tfmini_channel_count & (0b00000001 << 2))
+    LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_3);
+  if (tfmini_channel_count & (0b00000001 << 3))
+    LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_4);
+  if (tfmini_channel_count & (0b00000001 << 4))
+    LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_5);
+  uint16_t distance[72] = {0};
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -142,24 +158,22 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (GetTick() - tmp_uTick > 30)
+    if (GetTick() - tmp_uTick > 50)
     {
       for (uint8_t i = 0; i < 5; i++)
       {
         if (tfmini_channel_count & (0b00000001 << i))
           fetchDistance(tfmini + i);
       }
-      uint16_t distance[72] = {0};
       distance[0] = (tfmini)->Distance;
       distance[1] = (tfmini + 1)->Distance;
       distance[2] = (tfmini + 2)->Distance;
       distance[3] = (tfmini + 3)->Distance;
-      distance[4] = (tfmini + 4)->Distance;
-      printf("%d %d %d %d %d\r\n", distance[0], distance[1], distance[2], distance[3], distance[4]);
+      // printf("%d %d %d %d %d\r\n", distance[0], distance[1], distance[2], distance[3], distance[4]);
       mavlink_msg_obstacle_distance_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 2, distance, 0, 20, 1200, 90.f, 0.f, 0);
       mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
       UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
-      mavlink_msg_distance_sensor_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 20, 1200, distance[0], 2, 5, 24, 255, 0, 0, 0, 100);
+      mavlink_msg_distance_sensor_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 20, 1200, (tfmini + 4)->Distance, 2, 5, 24, 255, 0, 0, 0, 100);
       mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
       UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
       tmp_uTick = GetTick();
@@ -308,12 +322,23 @@ static void MX_USART1_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOC);
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOD);
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOB);
+
+  /**/
+  LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_1 | LL_GPIO_PIN_2 | LL_GPIO_PIN_3 | LL_GPIO_PIN_4 | LL_GPIO_PIN_5 | LL_GPIO_PIN_6);
+
+  /**/
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_1 | LL_GPIO_PIN_2 | LL_GPIO_PIN_3 | LL_GPIO_PIN_4 | LL_GPIO_PIN_5 | LL_GPIO_PIN_6;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
 /* USER CODE BEGIN 4 */

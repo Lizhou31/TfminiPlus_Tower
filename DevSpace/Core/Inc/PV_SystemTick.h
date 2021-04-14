@@ -19,16 +19,8 @@
 #ifndef __PVSYSTICK_H
 #define __PVSYSTICK_H
 #include "stm32f1xx.h"
-uint32_t msTick;
 
-__STATIC_INLINE void IncTick(void)
-{
-    msTick++;
-}
-
-__STATIC_INLINE uint32_t GetTick(void)
-{
-    return msTick;
-}
+void IncTick(void);
+uint32_t GetTick(void);
 
 #endif /* __PVSYSTICK_H */

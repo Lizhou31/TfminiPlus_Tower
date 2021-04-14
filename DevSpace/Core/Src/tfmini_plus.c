@@ -68,14 +68,12 @@ int8_t ScanDistanceSensor(tfmini_handler *tfmini)
         {
             return -1;
         }
-        printf("t\n");
         if (I2C_Master_Transmit(tfmini->hi2c, (tfmini->DevAddress) << 1, tfmini->cmd, 0U, 0xf))
         {
             tfmini = tfmini + 1;
             continue;
         }
         tfmini_channel_count |= channel[0];
-        printf("%d\n", channel[0]);
         channel[0] &= 0b00000000;
         if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, channel, 1U, 0xf))
         {
