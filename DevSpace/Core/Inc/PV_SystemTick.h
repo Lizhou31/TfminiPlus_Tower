@@ -14,6 +14,7 @@
 * CHANGES :
 *       DATE        WHO           DETAIL
 *       10MAR21     Lizhou        First Release Version.
+*       14APRI21    Lizhou        Add .c file, fix bugs?
 *
 *************************************************************************/
 #ifndef __PVSYSTICK_H
@@ -22,5 +23,6 @@
 
 void IncTick(void);
 uint32_t GetTick(void);
+void Delay(uint32_t Delay);
 
 #endif /* __PVSYSTICK_H */
