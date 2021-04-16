@@ -32,6 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+// #define DEBUG
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -50,8 +51,11 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
-// extern void initialise_monitor_handles(void);
+#ifdef DEBUG
+extern void initialise_monitor_handles(void);
+#endif
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -66,7 +70,9 @@ static void MX_USART1_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  // initialise_monitor_handles();
+#ifdef DEBUG
+  initialise_monitor_handles();
+#endif
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -101,7 +107,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
-
+  // MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   i2c_handler_Init(i2c1handler, I2C1);
   uart1handler->Instance = USART1;
@@ -158,12 +164,19 @@ int main(void)
     for (uint8_t i = 0; i < 5; i++)
     {
       if (tfmini_channel_count & (0b00000001 << i))
+      {
         fetchDistance(tfmini + i);
+        if (i < 4)
+          distance[i] = ((tfmini + i)->Distance) > 20 ? ((tfmini + i)->Distance) : 20;
+      }
+      else
+      {
+        if (i < 4)
+          distance[i] = 1201;
+        else if (i == 4)
+          (tfmini + 4)->Distance = 1201;
+      }
     }
-    distance[0] = ((tfmini)->Distance) > 20 ? ((tfmini)->Distance) : 20;
-    distance[1] = (tfmini + 1)->Distance > 20 ? (tfmini + 1)->Distance : 20;
-    distance[2] = (tfmini + 2)->Distance > 20 ? (tfmini + 2)->Distance : 20;
-    distance[3] = (tfmini + 3)->Distance > 20 ? (tfmini + 3)->Distance : 20;
 
     mavlink_msg_obstacle_distance_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 2, distance, 0, 20, 1200, 90.f, 0.f, 0);
     mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
@@ -203,6 +216,35 @@ void SystemClock_Config(void)
   }
   LL_Init1msTick(8000000);
   LL_SetSystemCoreClock(8000000);
+}
+
+/**
+  * @brief IWDG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  LL_IWDG_Enable(IWDG);
+  LL_IWDG_EnableWriteAccess(IWDG);
+  LL_IWDG_SetPrescaler(IWDG, LL_IWDG_PRESCALER_4);
+  LL_IWDG_SetReloadCounter(IWDG, 4095);
+  while (LL_IWDG_IsReady(IWDG) != 1)
+  {
+  }
+
+  LL_IWDG_ReloadCounter(IWDG);
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
 }
 
 /**

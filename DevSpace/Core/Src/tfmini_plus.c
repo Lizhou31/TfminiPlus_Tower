@@ -68,12 +68,10 @@ int8_t ScanDistanceSensor(tfmini_handler *tfmini)
         {
             return -1;
         }
-        if (I2C_Master_Transmit(tfmini->hi2c, (tfmini->DevAddress) << 1, tfmini->cmd, 0U, 0xf))
+        if (!I2C_Master_Transmit(tfmini->hi2c, (tfmini->DevAddress) << 1, tfmini->cmd, 0U, 0xf))
         {
-            tfmini = tfmini + 1;
-            continue;
+            tfmini_channel_count |= channel[0];
         }
-        tfmini_channel_count |= channel[0];
         channel[0] &= 0b00000000;
         if (I2C_Master_Transmit(tfmini->hi2c, (0x70) << 1, channel, 1U, 0xf))
         {
@@ -92,6 +90,7 @@ int8_t fetchDistance(tfmini_handler *tfmini)
     tfmini->cmd[2] = 0x00;
     tfmini->cmd[3] = 0x01;
     tfmini->cmd[4] = checkSum(tfmini->cmd, 5);
+    tfmini->Distance = 1201;
     if (getData_cmd(tfmini, 0x05, 0x09, tfmini->channel))
         return -1;
     if (tfmini->data[0] != 0x59 || tfmini->data[1] != 0x59)
