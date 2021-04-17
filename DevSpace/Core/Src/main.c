@@ -166,24 +166,23 @@ int main(void)
       if (tfmini_channel_count & (0b00000001 << i))
       {
         fetchDistance(tfmini + i);
-        if (i < 4)
-          distance[i] = ((tfmini + i)->Distance) > 20 ? ((tfmini + i)->Distance) : 20;
+        if((tfmini + i)->Distance > 20 && (tfmini + i)->Distance != 0)
+          distance[i] = (tfmini + i)->Distance;
+        else if((tfmini + i)->Distance == 0)
+          distance[i] = 1201;
       }
       else
       {
-        if (i < 4)
-          distance[i] = 1201;
-        else if (i == 4)
-          (tfmini + 4)->Distance = 1201;
+        distance[i] = 1201;
       }
     }
-
     mavlink_msg_obstacle_distance_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 2, distance, 0, 20, 1200, 90.f, 0.f, 0);
     mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
     UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
-    mavlink_msg_distance_sensor_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 20, 1200, ((tfmini + 4)->Distance > 20 ? (tfmini + 4)->Distance : 20), 2, 5, 24, 255, 0, 0, 0, 100);
+    mavlink_msg_distance_sensor_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 20, 1200, distance[4], 2, 5, 24, 255, 0, 0, 0, 100);
     mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
     UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
+    
   }
   /* USER CODE END 3 */
 }

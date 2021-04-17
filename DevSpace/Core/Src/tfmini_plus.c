@@ -90,9 +90,10 @@ int8_t fetchDistance(tfmini_handler *tfmini)
     tfmini->cmd[2] = 0x00;
     tfmini->cmd[3] = 0x01;
     tfmini->cmd[4] = checkSum(tfmini->cmd, 5);
-    tfmini->Distance = 1201;
     if (getData_cmd(tfmini, 0x05, 0x09, tfmini->channel))
+    {
         return -1;
+    }
     if (tfmini->data[0] != 0x59 || tfmini->data[1] != 0x59)
     {
         tfmini->ErrorCode = DATAHEADER_FAILED;
