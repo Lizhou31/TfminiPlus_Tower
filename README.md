@@ -6,5 +6,4 @@
 
 ## TODO
 * Add watchdog to prevent I2C connection error
-* PCB Layout
 * Add future extendible
