@@ -176,10 +176,10 @@ int main(void)
         distance[i] = 1201;
       }
     }
-    mavlink_msg_obstacle_distance_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 2, distance, 0, 20, 1200, 90.f, 0.f, 0);
+    mavlink_msg_obstacle_distance_pack(1, 191, &msg, ((uint64_t)GetTick()) * 1000, 2, distance, 0, 20, 1200, 90.f, 0.f, 0);
     mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
     UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
-    mavlink_msg_distance_sensor_pack(1, 1, &msg, ((uint64_t)GetTick()) * 1000, 20, 1200, distance[4], 2, 5, 24, 255, 0, 0, 0, 100);
+    mavlink_msg_distance_sensor_pack(1, 191, &msg, ((uint64_t)GetTick()) * 1000, 20, 1200, distance[4], 2, 5, 24, 255, 0, 0, 0, 100);
     mavlinklength = mavlink_msg_to_send_buffer(Txmsg, &msg);
     UART_Transmit(uart1handler, Txmsg, mavlinklength, 0x20);
     
