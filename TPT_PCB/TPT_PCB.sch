@@ -973,7 +973,7 @@ Wire Wire Line
 Text Label 10500 2750 0    50   ~ 0
 BOOT1
 $Comp
-L Lizhou_Lib:RT9013 U2
+L TPT_PCB-rescue:RT9013-Lizhou_Lib U2
 U 1 1 6093BD8F
 P 2000 5800
 F 0 "U2" H 2200 6150 50  0000 C CNN
@@ -1207,7 +1207,7 @@ U 1 1 60B741F9
 P 1800 7050
 F 0 "J6" H 1850 7350 50  0000 C CNN
 F 1 "SWD" H 1850 6750 50  0000 C CNN
-F 2 "Connector_PinSocket_1.27mm:PinSocket_2x05_P1.27mm_Vertical_SMD" H 1800 7050 50  0001 C CNN
+F 2 "Connector_Samtec_HLE_THT:Samtec_HLE-105-02-xx-DV-TE_2x05_P2.54mm_Horizontal" H 1800 7050 50  0001 C CNN
 F 3 "~" H 1800 7050 50  0001 C CNN
 	1    1800 7050
 	1    0    0    -1  
