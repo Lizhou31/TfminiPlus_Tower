@@ -50,7 +50,6 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include "PV_SystemTick.h"
 #include "i2c.h"
-#include "tfmini_plus.h"
 #include "uart.h"
 #include "mavlink.h"
 /* USER CODE END Includes */

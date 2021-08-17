@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "tfmini_plus.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -37,7 +37,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+I2CHandler i2chandler;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -91,7 +91,6 @@ int main(void)
   LL_GPIO_AF_EnableRemap_SWJ();
 
   /* USER CODE BEGIN Init */
-  I2CHANDLER i2c1handler;
   UARTHANDLER uart1handler;
   /* USER CODE END Init */
 
@@ -109,31 +108,26 @@ int main(void)
   MX_USART1_UART_Init();
   // MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
-  i2c_handler_Init(i2c1handler, I2C1);
+  i2chandler_init(&i2chandler, I2C1);
   uart1handler->Instance = USART1;
   uart1handler->ErrorCode = HAL_UART_ERROR_NONE;
   __IO uint16_t mavlinklength = 0;
   tfmini_handler tfmini[] =
       {{.DevAddress = 0x10,
-        .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
-        .hi2c = i2c1handler,
-        .channel = 0b00000001},
+        .channel = 0b00000001,
+        .ErrorCode = TFMINI_ERROR_NONE},
        {.DevAddress = 0x13,
-        .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
-        .hi2c = i2c1handler,
-        .channel = 0b00000010},
+        .channel = 0b00000010,
+        .ErrorCode = TFMINI_ERROR_NONE},
        {.DevAddress = 0x12,
-        .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
-        .hi2c = i2c1handler,
-        .channel = 0b00000100},
+        .channel = 0b00000100,
+        .ErrorCode = TFMINI_ERROR_NONE},
        {.DevAddress = 0x11,
-        .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
-        .hi2c = i2c1handler,
-        .channel = 0b00001000},
+        .channel = 0b00001000,
+        .ErrorCode = TFMINI_ERROR_NONE},
        {.DevAddress = 0x14,
-        .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
-        .hi2c = i2c1handler,
-        .channel = 0b00010000}};
+        .channel = 0b00010000,
+        .ErrorCode = TFMINI_ERROR_NONE}};
   mavlink_message_t msg;
   uint8_t Txmsg[174] = {0};
 
@@ -165,7 +159,7 @@ int main(void)
     {
       if (tfmini_channel_count & (0b00000001 << i))
       {
-        fetchDistance(tfmini + i);
+        updateDistance(tfmini + i);
         if((tfmini + i)->Distance > 20 && (tfmini + i)->Distance != 0)
           distance[i] = (tfmini + i)->Distance;
         else if((tfmini + i)->Distance == 0)
