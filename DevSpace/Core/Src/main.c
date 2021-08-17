@@ -130,7 +130,7 @@ int main(void)
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler,
         .channel = 0b00001000},
-       {.DevAddress = 0x15,
+       {.DevAddress = 0x14,
         .cmd = {0x5A, 0x05, 0x00, 0x01, 60},
         .hi2c = i2c1handler,
         .channel = 0b00010000}};
